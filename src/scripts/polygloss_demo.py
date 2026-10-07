@@ -13,13 +13,12 @@ device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is
 # trust_remote_code: the model repo supplies predict_igt() (polygloss_seq2seq.py).
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID, trust_remote_code=True).to(device).eval()
  
-with torch.inference_mode():
-    output = model.predict_igt(
-        "o sey xtok rixoqiil",   # transcription
-        "O sea busca esposa.",   # translation (can be None)
-        "Uspanteco",             # language name
-        "Spanish",               # metalanguage of the translation/glosses
-    )
- 
-print(output)  # interleaved: GLOSS(morpheme)-GLOSS(morpheme) ...
+# Predict IGT outputs
+transcription = "o sey xtok rixoqiil"
+translation = "O sea busca esposa."
+lang = "Uspanteco"
+metalang = "Spanish"
+
+output = model.predict_igt(transcription, translation, lang, metalang)
+print(outputs)
  

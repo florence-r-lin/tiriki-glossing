@@ -24,3 +24,4 @@ reports/
 *.tsv
 !mappings/*.tsv
  
+tiriki-corpus
