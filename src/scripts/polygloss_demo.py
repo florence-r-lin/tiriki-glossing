@@ -8,10 +8,17 @@ from transformers import AutoModelForSeq2SeqLM
  
 MODEL_ID = "lecslab/polygloss-byt5-interleaved-2025-12-28"
  
-device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+device = "cuda"
  
 # trust_remote_code: the model repo supplies predict_igt() (polygloss_seq2seq.py).
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID, trust_remote_code=True).to(device).eval()
+
+# predict_igt() builds its inputs on CPU; move them to the GPU before generate() runs.
+_orig_generate = model.generate
+def _generate_on_device(*args, **kwargs):
+    kwargs = {k: v.to(model.device) if torch.is_tensor(v) else v for k, v in kwargs.items()}
+    return _orig_generate(*args, **kwargs)
+model.generate = _generate_on_device
  
 # Predict IGT outputs
 # transcription: Uspanteko, Mayan language in Guatemala
