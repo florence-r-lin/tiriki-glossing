@@ -21,7 +21,7 @@ from collections import Counter
  
 # Person/number shorthands used in some stories; all other macros are
 # just upper-cased (\Sm -> SM, \Pst -> PST).
-MACROS = {"Fsg": "1SG", "Ssg": "2SG", "Tsg": "3SG",
+macros = {"Fsg": "1SG", "Ssg": "2SG", "Tsg": "3SG",
           "Fpl": "1PL", "Spl": "2PL", "Tpl": "3PL"}
  
  
@@ -35,7 +35,7 @@ def clean(text, quotes=False):
             break
         text = new
     text = re.sub(r"\\textsc\{([^{}]*)\}", lambda m: m.group(1).upper(), text)
-    text = re.sub(r"\\([A-Za-z]+)(\{\})?", lambda m: MACROS.get(m.group(1), m.group(1).upper()), text)
+    text = re.sub(r"\\([A-Za-z]+)(\{\})?", lambda m: macros.get(m.group(1), m.group(1).upper()), text)
     text = re.sub(r"\\(\d)", r"\1", text)  # typos like \1\Sm
     text = re.sub(r"[\\{}]", "", text)
     if not quotes:
@@ -104,8 +104,8 @@ def parse_file(path):
  
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("directory", nargs="?", type=Path, default=Path("tiriki-corpus/raw"))
-    ap.add_argument("-o", "--output", type=Path, default=Path("tiriki-corpus/processed/examples.jsonl"))
+    ap.add_argument("directory", nargs="?", type=Path)
+    ap.add_argument("-o", "--output", type=Path, required=True)
     args = ap.parse_args()
 
     args.output.parent.mkdir(parents=True, exist_ok=True)

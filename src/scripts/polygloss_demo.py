@@ -6,12 +6,12 @@
 import torch
 from transformers import AutoModelForSeq2SeqLM
  
-MODEL_ID = "lecslab/polygloss-byt5-interleaved-2025-12-28"
+model_id = "lecslab/polygloss-byt5-interleaved-2025-12-28"
  
 device = "cuda"
  
 # trust_remote_code: the model repo supplies predict_igt() (polygloss_seq2seq.py).
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID, trust_remote_code=True).to(device).eval()
+model = AutoModelForSeq2SeqLM.from_pretrained(model_id, trust_remote_code=True).to(device).eval()
 
 # predict_igt() builds its inputs on CPU; move them to the GPU before generate() runs.
 _orig_generate = model.generate

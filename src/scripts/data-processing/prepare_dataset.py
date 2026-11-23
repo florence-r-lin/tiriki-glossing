@@ -28,11 +28,11 @@ from glossing.igt import gloss_string_to_word_glosses
 
 lang = "Tiriki"
 metalang = "English"
-SPLITS = ["train", "eval", "test"]
+splits = ["train", "eval", "test"]
 
 # Prompt templates from polygloss/src/dataset/*.prompt.
 # Takes into account the white space and blank lines necessary for formatting
-TEMPLATES = {
+templates = {
     "t2sg_interleaved": Template(
         "Predict the glosses and morphological segmentation (in parentheses) "
         "for the following text in $lang.\n"
@@ -61,15 +61,16 @@ TEMPLATES = {
 }
 
 # Morpheme boundaries, as in polygloss/data/model.py
-MORPHEME_BOUNDARIES = ["-", "="]
-boundary_pattern = re.compile("|".join(re.escape(b) for b in MORPHEME_BOUNDARIES))
+morph_boundaries = ["-", "="]
+boundary_pattern = re.compile("|".join(re.escape(b) for b in morph_boundaries))
 
 
 class DataError(ValueError):
     pass
 
 
-
+punct = r"(?:(?![-='’])\p{P})"
+word_char = r"[\p{L}\p{N}\p{M}'’]"
 # Prepares the prompt, similar to _prepare_prompt_fields w/in polygloss/src/dataset/prepare_dataset.py
 def normalize(text: str | None) -> str:
     """NFC normalization and collapsed whitespaces. 
@@ -77,7 +78,10 @@ def normalize(text: str | None) -> str:
     """
     if text is None:
         return ""
-    return " ".join(unicodedata.normalize("NFC", text).split())
+    text = unicodedata.normalize("NFC", text)
+    text = re.sub(rf"(?<={word_char})({punct}+)(?=\s|$)", r" \1", text)
+    text = re.sub(rf"(?:^|(?<=\s))({punct}+)(?={word_char})", r"\1 ", text)
+    return " ".join(text.split())
 
 
 def prepare_fields(row: dict) -> dict:
@@ -176,7 +180,7 @@ def convert_split(rows: list[dict], split: str, interleaved_only: bool):
             tasks += [("t2g", f["glosses"]), ("s2g", f["glosses"])]
         for task, target in tasks:
             examples.append(
-                {"input": TEMPLATES[task].substitute(f), "label": target, "task": task, "id": id_}
+                {"input": templates[task].substitute(f), "label": target, "task": task, "id": id_}
             )
     return examples, errors
 
@@ -195,14 +199,14 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
 
 def main() -> int:
     p = argparse.ArgumentParser(description="Convert Tiriki JSONL splits into PolyGloss's interleaved format.")
-    p.add_argument("--in-dir", type=Path, default=Path("data/interim"))
-    p.add_argument("--out-dir", type=Path, default=Path("data/processed"))
+    p.add_argument("--in-dir", type=Path, required=True)
+    p.add_argument("--out-dir", type=Path, required=True)
     p.add_argument("--interleaved-only", action="store_true",
                    help="only make transcription -> interleaved examples")
     args = p.parse_args()
 
     all_errors = []
-    for split in SPLITS:
+    for split in splits:
         rows = read_jsonl(args.in_dir / f"{split}.jsonl")
         examples, errors = convert_split(rows, split, args.interleaved_only)
         all_errors += errors
@@ -222,7 +226,7 @@ def main() -> int:
         return 1
 
     # Byte lengths, for choosing max_length (ByT5 counts bytes, +1 for </s>).
-    for split in SPLITS:
+    for split in splits:
         ex = read_jsonl(args.out_dir / f"{split}.jsonl")
         max_in = max(len(e["input"].encode("utf-8")) for e in ex) + 1
         max_out = max(len(e["label"].encode("utf-8")) for e in ex) + 1

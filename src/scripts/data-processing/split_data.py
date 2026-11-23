@@ -8,7 +8,7 @@ import json
 import sys
 from collections import Counter
 
-SPEAKERS = {
+speakers = {
     "004": "Billy Jivetti",
     "007": "James Musambi",
     "010": "Harun Masambu",
@@ -31,7 +31,7 @@ SPEAKERS = {
     "286": "Ronald Savai",
 }
 
-SPLITS = {
+splits = {
     "Makurita Muhatia": "train",
     "Rose Jivetti": "train",
     "Billy Jivetti": "train",
@@ -51,11 +51,11 @@ with open(sys.argv[1], encoding="utf-8") as f:
             continue
         record = json.loads(line)
         story = record["id"].split(":")[0]
-        speaker = SPEAKERS.get(story)
+        speaker = speakers.get(story)
         if speaker is None:
             skipped.append(record["id"])
             continue
-        out[SPLITS[speaker]].append(record)
+        out[splits[speaker]].append(record)
 
 for name, records in out.items():
     with open(f"{name}.jsonl", "w", encoding="utf-8") as f:

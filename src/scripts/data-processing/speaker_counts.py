@@ -8,7 +8,7 @@ import json
 import sys
 from collections import Counter
 
-SPEAKERS = {
+speakers = {
     "004": "Billy Jivetti",
     "007": "James Musambi",
     "010": "Harun Masambu",
@@ -41,7 +41,7 @@ with open(sys.argv[1], encoding="utf-8") as f:
             lines_per_story[story] += 1
 
 # Keep only stories that have both a speaker and lines in the file
-rows = [(SPEAKERS[s], s, n) for s, n in lines_per_story.items() if s in SPEAKERS]
+rows = [(speakers[s], s, n) for s, n in lines_per_story.items() if s in speakers]
 rows.sort()
 
 print(f"{'Speaker':<20} {'Story':<6} {'Lines':>5}")

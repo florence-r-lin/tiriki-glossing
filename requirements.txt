@@ -3,7 +3,6 @@ editdistance==0.8.1
 glossing>=1.0.9
 huggingface-hub>=0.19.4
 iso639_lang==2.6.1
-langid==1.1.6
 numpy<2
 pytest
 pandas==2.3.1
@@ -13,4 +12,6 @@ tqdm==4.67.1
 transformers==4.51.1
 peft==0.17.1
 wandb
-bitsandbytes
+regex
+accelerate
+sacrebleu
