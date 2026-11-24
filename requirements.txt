@@ -14,4 +14,3 @@ peft==0.17.1
 wandb
 regex
 accelerate
-sacrebleu

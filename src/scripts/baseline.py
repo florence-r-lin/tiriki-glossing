@@ -4,6 +4,9 @@ Usage:
     python3 tiriki-glossing/src/scripts/baseline.py tiriki-glossing/tiriki-corpus/processed/eval.jsonl tiriki-glossing/tiriki-corpus/outputs/baseline_eval.jsonl
     python3 tiriki-glossing/src/scripts/baseline.py tiriki-glossing/tiriki-corpus/processed/test.jsonl tiriki-glossing/tiriki-corpus/outputs/baseline_test.jsonl
 
+3rd argument: folder w/ LoRA adapter. For generating glosses w/ attached adapter
+    python3 tiriki-glossing/src/scripts/run_baseline.py tiriki-glossing/tiriki-corpus/processed/eval.jsonl tiriki-glossing/outputs/lora_r8_eval.jsonl tiriki-glossing/checkpoints/lora_r8
+
 """
 
 import json
@@ -11,6 +14,7 @@ import sys
 from pathlib import Path
 import torch
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from peft import PeftModel
 
 model_id = "lecslab/polygloss-byt5-interleaved-2025-12-28"
 batch_size = 16  
@@ -23,7 +27,11 @@ rows = [r for r in rows if r["task"] == "t2sg_interleaved"]
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=False)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_id, trust_remote_code=True).to(device)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_id, trust_remote_code=True)
+# 3rd argument, specifies adapter folder for LoRA to generate glosses with the adapter attached
+if len(sys.argv) > 3:
+    model = PeftModel.from_pretrained(model, sys.argv[3])
+model = model.to(device)
 
 predictions = []
 for start in range(0, len(rows), batch_size):
