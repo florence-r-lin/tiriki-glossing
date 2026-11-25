@@ -1,7 +1,7 @@
 """Load base PolyGloss (no adaptation) and gloss one sentence.
  
     pip install torch "transformers>=4.51"
-    python3 src/scritps/polygloss_demo.py
+    python3 src/scripts/polygloss_demo.py
 """
 import torch
 from transformers import AutoModelForSeq2SeqLM
@@ -28,8 +28,8 @@ model.generate = _generate_on_device
 # metalang = "Spanish"
 
 # Ex. Tiriki, un-adapted
-transcription = "vamunaka vusela"
-translation = "She had prepared porridge"
+transcription = "Na musheele wewe namukaribisha"
+translation = "His wife welcomed him"
 lang = "Tiriki"
 metalang = "English"
 
