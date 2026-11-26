@@ -2,6 +2,7 @@
 
 Usage:
     python3 -m evaluation.compare tiriki-corpus/outputs/baseline_test.jsonl tiriki-corpus/outputs/lora_test.jsonl
+    python3 -m evaluation.compare ../../tiriki-corpus/outputs/baseline_test.jsonl ../../tiriki-corpus/results/test_predictions_lora_r16.jsonl
 """
 
 import json

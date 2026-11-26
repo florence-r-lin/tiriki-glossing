@@ -2,7 +2,7 @@
  
 Settings from PolyGloss repo:
 - LoRA rank 8
-- alpha 8
+- alpha 8 (1:1 ratio)
 - dropout .2
 - AdamW
 - 3% warmup
@@ -12,7 +12,7 @@ Settings from PolyGloss repo:
 - Settings from paper's Vamale run: batchsize 32, 25 epochs. Keeping epoch with lowest eval loss
  
 Usage:
-    CUDA_VISIBLE_DEVICES=0 python3 src/scripts/train_lora.py tiriki-corpus/processed/train.jsonl tiriki-corpus/processed/eval.jsonl checkpoints/lora_r8
+    CUDA_VISIBLE_DEVICES=1 python3 src/scripts/train_lora.py tiriki-corpus/processed/train.jsonl tiriki-corpus/processed/eval.jsonl checkpoints/lora_r16
 """
  
 import sys
@@ -26,7 +26,7 @@ from transformers import (AutoModelForSeq2SeqLM, AutoTokenizer, DataCollatorForS
 model_id = "lecslab/polygloss-byt5-interleaved-2025-12-28"
 train_path, eval_path, out_dir = sys.argv[1], sys.argv[2], sys.argv[3]
  
-rank = 8
+rank = 16
 learning_rate = 5e-5
 min_learning_rate = 1e-5
 weight_decay = 0.01
@@ -37,7 +37,7 @@ seed = 0
 
 tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=False)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_id, trust_remote_code=True)
-lora_config = LoraConfig(task_type=TaskType.SEQ_2_SEQ_LM, r=rank, lora_alpha=8, lora_dropout=0.2)
+lora_config = LoraConfig(task_type=TaskType.SEQ_2_SEQ_LM, r=rank, lora_alpha=16, lora_dropout=0.2)
 model = get_peft_model(model, lora_config)
 model.enable_input_require_grads()
 model.print_trainable_parameters()

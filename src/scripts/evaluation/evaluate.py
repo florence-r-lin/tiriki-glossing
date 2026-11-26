@@ -8,8 +8,10 @@
 Additions to PolyGloss: lowercase segmentation first and leave out lines with TBD
 
 Usage:
-    python3 -m src/scripts/evaluation/evaluate.py tiriki-corpus/outputs/baseline_eval.jsonl
-    python3 -m src/scripts/evaluation/evaluate.py tiriki-corpus/outputs/baseline_test.jsonl
+    cd tiriki-glossing/src/scripts
+    python3 -m evaluation.evaluate tiriki-corpus/baseline/baseline_eval.jsonl
+    python3 -m evaluation.evaluate tiriki-corpus/baseline/baseline_test.jsonl
+    python3 -m evaluation.evaluate ../../tiriki-corpus/results/test_predictions_lora_r16.jsonl
 """
 
 import json
